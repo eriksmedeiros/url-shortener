@@ -22,11 +22,12 @@ public class UrlController {
     }
 
     @PostMapping("/shorten-url")
-    public ResponseEntity<?> shortenUrl(@RequestBody Request request,
+    public ResponseEntity<Response> shortenUrl(@RequestBody Request request,
                                                     HttpServletRequest servletRequest) {
         String fullUrl = request.url();
         UrlModel url = urlService.createShortUrl(fullUrl);
 
+        // Obtem a URL da requisição e altera o caminho (URI) para incluir o ID da URL encurtada
         String redirectUrl = servletRequest.getRequestURL().toString().replace(servletRequest.getRequestURI(), "");
         String shortUrl = redirectUrl + "/" + url.getId();
 
@@ -36,6 +37,7 @@ public class UrlController {
     @GetMapping("/{id}")
     public ResponseEntity<Void> redirect(@PathVariable("id") String id) {
         UrlModel urlModel = urlService.findById(id);
+        // Redireciona para a URL completa
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(urlModel.getFullUrl()))
                 .build();

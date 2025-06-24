@@ -18,11 +18,13 @@ public class UrlService {
 
     public UrlModel createShortUrl(String fullUrl) {
         String id = generateUniqueId();
-        UrlModel url = new UrlModel(id, fullUrl, LocalDateTime.now());
+        UrlModel url = new UrlModel(id, fullUrl, LocalDateTime.now().plusHours(1));
 
         return urlRepository.save(url);
     }
 
+    // gera um ID único para cada URL
+    // randomAlphanumeric gera uma string aleatória com letras maiúsculas, minúsculas e números
     private String generateUniqueId() {
         String id;
         do {
@@ -32,7 +34,13 @@ public class UrlService {
     }
 
     public UrlModel findById(String id) {
-        return urlRepository.findById(id)
+        UrlModel url = urlRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("URL not found"));
+
+        if (url.getExpiresAt() != null && url.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("URL has expired");
+        }
+
+        return url;
     }
 }
