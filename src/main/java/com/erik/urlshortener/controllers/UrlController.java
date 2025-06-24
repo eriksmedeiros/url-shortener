@@ -1,7 +1,7 @@
 package com.erik.urlshortener.controllers;
 
-import com.erik.urlshortener.dto.ShortenUrlRequestDto;
-import com.erik.urlshortener.dto.ShortenUrlResponseUrl;
+import com.erik.urlshortener.dto.Request;
+import com.erik.urlshortener.dto.Response;
 import com.erik.urlshortener.models.UrlModel;
 import com.erik.urlshortener.services.UrlService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,19 +22,19 @@ public class UrlController {
     }
 
     @PostMapping("/shorten-url")
-    public ResponseEntity<?> shortenUrl(@RequestBody ShortenUrlRequestDto shortenUrlRequestDto,
+    public ResponseEntity<?> shortenUrl(@RequestBody Request request,
                                                     HttpServletRequest servletRequest) {
-        String fullUrl = shortenUrlRequestDto.url();
+        String fullUrl = request.url();
         UrlModel url = urlService.createShortUrl(fullUrl);
 
         String redirectUrl = servletRequest.getRequestURL().toString().replace(servletRequest.getRequestURI(), "");
         String shortUrl = redirectUrl + "/" + url.getId();
 
-        return ResponseEntity.ok(new ShortenUrlResponseUrl(shortUrl));
+        return ResponseEntity.ok(new Response(shortUrl));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Void> redirectToOriginalUrl(@PathVariable String id) {
+    public ResponseEntity<Void> redirect(@PathVariable("id") String id) {
         UrlModel urlModel = urlService.findById(id);
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(urlModel.getFullUrl()))
