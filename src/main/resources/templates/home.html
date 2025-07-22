@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Encurtador de URL</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 400px; margin: auto; }
+        input[type="url"] { width: 100%; padding: 8px; margin-bottom: 10px; }
+        button { padding: 8px 16px; }
+        .result { margin-top: 20px; }
+        .error { color: red; margin-top: 10px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Encurtador de URL</h2>
+    <form th:action="@{/shorten-url}" method="post">
+        <input type="url" name="url" placeholder="Cole sua URL aqui" required>
+        <button type="submit">Encurtar</button>
+    </form>
+    <div class="result" th:if="${shortUrl != null}">
+        URL original: <span th:text="${fullUrl}"></span><br>
+        URL encurtada: <a th:href="@{${shortUrl}}" th:text="${shortUrl}" target="_blank"></a>
+    </div>
+    <div class="error" th:if="${error != null}" th:text="${error}"></div>
+</div>
+</body>
+</html>

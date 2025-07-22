@@ -7,12 +7,13 @@ import com.erik.urlshortener.services.UrlService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
-@RestController
-@RequestMapping
+@Controller
 public class UrlController {
 
     private final UrlService urlService;
@@ -21,17 +22,25 @@ public class UrlController {
         this.urlService = urlService;
     }
 
+    @GetMapping("/")
+    public String home() {
+        return "home";
+    }
+
     @PostMapping("/shorten-url")
-    public ResponseEntity<Response> shortenUrl(@RequestBody Request request,
-                                                    HttpServletRequest servletRequest) {
+    public String shortenUrl(@ModelAttribute Request request,
+                             HttpServletRequest servletRequest,
+                             Model model) {
         String fullUrl = request.url();
         UrlModel url = urlService.createShortUrl(fullUrl);
 
         // Obtem a URL da requisição e altera o caminho (URI) para incluir o ID da URL encurtada
         String redirectUrl = servletRequest.getRequestURL().toString().replace(servletRequest.getRequestURI(), "");
         String shortUrl = redirectUrl + "/" + url.getId();
+        model.addAttribute("shortUrl", shortUrl);
+        model.addAttribute("fullUrl", fullUrl);
 
-        return ResponseEntity.ok(new Response(shortUrl));
+        return "home";
     }
 
     @GetMapping("/{id}")
